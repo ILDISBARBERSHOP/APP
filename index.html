@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <meta name="theme-color" content="#050505">
+    
+    <!-- PWA Settings -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-512.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+
+    <!-- Apple iOS Settings -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ILDI'S BARBER">
+    <meta name="application-name" content="ILDI'S BARBERSHOP">
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <title>ILDI'S BARBERSHOP • Prenotazioni</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #050505;
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        /* Schermata di Caricamento Iniziale */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #050505;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+
+        #loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .loader-logo {
+            width: 130px;
+            height: 130px;
+            border-radius: 26px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(212, 175, 55, 0.2);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            margin-bottom: 25px;
+            object-fit: cover;
+        }
+
+        .spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #d4af37;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Iframe App a Schermo Intero */
+        #app-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+            background: #050505;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loading Screen con Logo -->
+    <div id="loader">
+        <img class="loader-logo" src="icon-512.png" alt="ILDI'S BARBERSHOP">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Web App Prenotazioni Iframe -->
+    <iframe id="app-frame" src="" allow="clipboard-write; payment; geolocation"></iframe>
+
+    <script>
+        // =========================================================================
+        // CONFIGURAZIONE URL DI GOOGLE APPS SCRIPT
+        // Incolla qui sotto tra le virgolette il link del tuo Apps Script Web App:
+        // =========================================================================
+        const DEFAULT_APPS_SCRIPT_URL = "INSERISCI_QUI_IL_TUO_LINK_APPS_SCRIPT";
+
+        // Se l'utente passa un parametro ?app=... nell'URL usa quello, altrimenti usa il link di default
+        const urlParams = new URLSearchParams(window.location.search);
+        const scriptUrl = urlParams.get('app') || DEFAULT_APPS_SCRIPT_URL;
+
+        const iframe = document.getElementById('app-frame');
+        const loader = document.getElementById('loader');
+
+        if (scriptUrl && scriptUrl !== "INSERISCI_QUI_IL_TUO_LINK_APPS_SCRIPT") {
+            // Aggiunge eventuali parametri attuali (es. page=operatore o operatore=1)
+            let finalUrl = scriptUrl;
+            if (window.location.search && !urlParams.has('app')) {
+                finalUrl += (finalUrl.includes('?') ? '&' : '?') + window.location.search.substring(1);
+            }
+            iframe.src = finalUrl;
+
+            // Rimuove la schermata di caricamento quando l'iframe ha finito di caricare
+            iframe.onload = () => {
+                setTimeout(() => {
+                    loader.classList.add('hidden');
+                }, 400);
+            };
+
+            // Fallback: nasconde comunque il loader dopo 4 secondi in caso di ritardi di rete
+            setTimeout(() => {
+                loader.classList.add('hidden');
+            }, 4000);
+        } else {
+            // Messaggio guida nel caso non sia stato ancora incollato il link
+            loader.innerHTML = `
+                <img class="loader-logo" src="icon-512.png" alt="ILDI'S BARBERSHOP">
+                <div style="max-width: 380px; text-align: center; padding: 20px; font-size: 0.95rem; line-height: 1.6; color: #ccc;">
+                    <strong style="color: #d4af37; font-size: 1.15rem; display: block; margin-bottom: 10px;">PWA ILDI'S BARBERSHOP PRONTA!</strong>
+                    Apri il file <code style="background: #222; padding: 2px 6px; border-radius: 4px; color: #fff;">pwa/index.html</code> e incolla il tuo link di Google Apps Script nella riga <code style="background: #222; padding: 2px 6px; border-radius: 4px; color: #fff;">DEFAULT_APPS_SCRIPT_URL</code>.
+                </div>
+            `;
+        }
+
+        // Registrazione del Service Worker per abilitare l'installazione PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('PWA Service Worker registrato con successo'))
+                    .catch(err => console.log('Errore Service Worker:', err));
+            });
+        }
+    </script>
+</body>
+</html>
