@@ -89,9 +89,262 @@
             display: block;
             background: #050505;
         }
+
+        /* In-App Browser Detection Overlay (Instagram/Facebook) */
+        #inAppBrowserOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(5, 5, 5, 0.96);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            z-index: 9999999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        .in-app-arrow-container {
+            position: absolute;
+            top: 15px;
+            right: 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 6px;
+            animation: iabBounce 1.4s infinite ease-in-out;
+            pointer-events: none;
+        }
+
+        .in-app-arrow-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(245, 199, 150, 0.15);
+            border: 1px solid rgba(245, 199, 150, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(245, 199, 150, 0.35);
+        }
+
+        .in-app-arrow-hint {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #f5c796;
+            background: rgba(20, 20, 20, 0.9);
+            padding: 4px 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(245, 199, 150, 0.3);
+            white-space: nowrap;
+        }
+
+        @keyframes iabBounce {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            50% { transform: translateY(-8px) translateX(6px); }
+        }
+
+        .in-app-card {
+            background: #111111;
+            border: 1px solid rgba(245, 199, 150, 0.35);
+            border-radius: 22px;
+            padding: 28px 24px;
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9), 0 0 30px rgba(245, 199, 150, 0.1);
+            box-sizing: border-box;
+        }
+
+        .in-app-logo-badge {
+            display: inline-block;
+            font-size: 0.82rem;
+            letter-spacing: 1.5px;
+            font-weight: 800;
+            color: #f5c796;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            padding: 5px 14px;
+            background: rgba(245, 199, 150, 0.08);
+            border-radius: 20px;
+            border: 1px solid rgba(245, 199, 150, 0.2);
+        }
+
+        .in-app-title {
+            font-size: 1.45rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            color: #ffffff;
+            letter-spacing: 0.3px;
+        }
+
+        .in-app-desc {
+            font-size: 0.9rem;
+            color: #bbb;
+            line-height: 1.5;
+            margin-bottom: 22px;
+        }
+
+        .in-app-steps {
+            background: #181818;
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin-bottom: 22px;
+            text-align: left;
+            border: 1px solid #282828;
+        }
+
+        .in-app-step-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .in-app-step-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .in-app-step-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #f5c796;
+            color: #050505;
+            font-weight: 800;
+            font-size: 0.88rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .in-app-step-txt {
+            font-size: 0.88rem;
+            color: #ddd;
+            line-height: 1.35;
+        }
+
+        .in-app-step-txt strong {
+            color: #fff;
+        }
+
+        .in-app-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .in-app-btn-gold {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            background: linear-gradient(135deg, #f5c796, #d4af37);
+            color: #050505;
+            font-weight: 800;
+            font-size: 0.95rem;
+            padding: 14px;
+            border-radius: 12px;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(245, 199, 150, 0.3);
+            border: none;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+
+        .in-app-btn-outline {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            background: #222;
+            color: #f5c796;
+            border: 1px solid rgba(245, 199, 150, 0.4);
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-sizing: border-box;
+        }
+
+        .in-app-btn-outline:hover {
+            background: #2a2a2a;
+        }
+
+        .in-app-btn-dismiss {
+            background: transparent;
+            border: none;
+            color: #777;
+            font-size: 0.82rem;
+            cursor: pointer;
+            text-decoration: underline;
+            padding: 6px;
+            transition: color 0.2s;
+        }
+
+        .in-app-btn-dismiss:hover {
+            color: #aaa;
+        }
     </style>
 </head>
 <body>
+
+    <!-- In-App Browser Overlay (Instagram / Facebook) -->
+    <div id="inAppBrowserOverlay" style="display: none;">
+        <div class="in-app-arrow-container">
+            <div class="in-app-arrow-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#f5c796" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="7" y1="17" x2="17" y2="7"></line>
+                    <polyline points="7 7 17 7 17 17"></polyline>
+                </svg>
+            </div>
+            <span class="in-app-arrow-hint">Tocca i 3 puntini qui ⋯</span>
+        </div>
+
+        <div class="in-app-card">
+            <div class="in-app-logo-badge">✂️ ILDI'S BARBERSHOP</div>
+            <h2 class="in-app-title">Apri nel tuo Browser</h2>
+            <p class="in-app-desc">
+                Instagram limita le prenotazioni nel suo browser interno. Per prenotare al meglio e salvare l'app sul telefono, apri questa pagina in Safari o Chrome.
+            </p>
+
+            <div class="in-app-steps" id="iabIosGuide">
+                <div class="in-app-step-item">
+                    <div class="in-app-step-num">1</div>
+                    <div class="in-app-step-txt">In alto a destra tocca i <strong>3 puntini (⋯)</strong></div>
+                </div>
+                <div class="in-app-step-item">
+                    <div class="in-app-step-num">2</div>
+                    <div class="in-app-step-txt">Seleziona <strong>"Apri in Safari"</strong> o <strong>"Apri nel browser"</strong></div>
+                </div>
+            </div>
+
+            <div class="in-app-actions">
+                <a id="iabAndroidBtn" href="#" class="in-app-btn-gold" style="display: none;">
+                    🚀 Apri in Google Chrome
+                </a>
+                <button type="button" class="in-app-btn-outline" onclick="copyIabLink()">
+                    📋 Copia Link Prenotazione
+                </button>
+                <div id="iabCopyToast" style="display: none; color: #a5d6a7; font-size: 0.85rem; margin-top: 5px;">✓ Link copiato negli appunti!</div>
+            </div>
+
+            <button type="button" class="in-app-btn-dismiss" onclick="dismissIabOverlay()">
+                Continua comunque nel browser di Instagram &rarr;
+            </button>
+        </div>
+    </div>
 
     <!-- Loading Screen con Logo -->
     <div id="loader">
@@ -103,11 +356,104 @@
     <iframe id="app-frame" src="" allow="clipboard-write; payment; geolocation"></iframe>
 
     <script>
+        // Gestione apertura da Instagram / Meta In-App Browser
+        function handleInAppBrowser() {
+            if (sessionStorage.getItem('dismiss_inapp_notice') === 'true') {
+                return;
+            }
+
+            var ua = navigator.userAgent || navigator.vendor || window.opera || '';
+            var isInstagramOrMeta = /Instagram|FBAN|FBAV|FB_IAB|Messenger/i.test(ua);
+
+            if (!isInstagramOrMeta) {
+                return;
+            }
+
+            var isAndroid = /android/i.test(ua);
+            var currentUrl = window.location.href;
+            var cleanUrl = currentUrl.replace(/^https?:\/\//, '');
+
+            var overlay = document.getElementById('inAppBrowserOverlay');
+            if (overlay) {
+                overlay.style.display = 'flex';
+            }
+
+            // Se Android: reindirizzamento automatico a Google Chrome tramite Android Intent
+            if (isAndroid) {
+                var chromeIntent = 'intent://' + cleanUrl + '#Intent;scheme=https;package=com.android.chrome;end';
+                var androidBtn = document.getElementById('iabAndroidBtn');
+                if (androidBtn) {
+                    androidBtn.href = chromeIntent;
+                    androidBtn.style.display = 'inline-flex';
+                }
+                var iosGuide = document.getElementById('iabIosGuide');
+                if (iosGuide) {
+                    iosGuide.style.display = 'none';
+                }
+                try {
+                    window.location.href = chromeIntent;
+                } catch(e) {}
+                return;
+            }
+
+            // Se iOS: mostra indicatore e guida verso i 3 puntini
+            var iosGuide = document.getElementById('iabIosGuide');
+            if (iosGuide) {
+                iosGuide.style.display = 'block';
+            }
+        }
+
+        function copyIabLink() {
+            var url = window.location.href;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(function() {
+                    showIabToast();
+                }).catch(function() {
+                    fallbackCopyIab(url);
+                });
+            } else {
+                fallbackCopyIab(url);
+            }
+        }
+
+        function fallbackCopyIab(text) {
+            var ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            try {
+                document.execCommand('copy');
+                showIabToast();
+            } catch(e) {}
+            document.body.removeChild(ta);
+        }
+
+        function showIabToast() {
+            var toast = document.getElementById('iabCopyToast');
+            if (toast) {
+                toast.style.display = 'block';
+                setTimeout(function() { toast.style.display = 'none'; }, 3500);
+            }
+        }
+
+        function dismissIabOverlay() {
+            sessionStorage.setItem('dismiss_inapp_notice', 'true');
+            var overlay = document.getElementById('inAppBrowserOverlay');
+            if (overlay) {
+                overlay.style.display = 'none';
+            }
+        }
+
+        // Controllo immediato all'avvio
+        handleInAppBrowser();
+
         // =========================================================================
         // CONFIGURAZIONE URL DI GOOGLE APPS SCRIPT
         // Incolla qui sotto tra le virgolette il link del tuo Apps Script Web App:
         // =========================================================================
-        const DEFAULT_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzITVCeUT4qoy2zOR3ZbsjQ7Hebbkho7lQLidqy8H5LgwuvNu7yX2BoPPGWa00fzted7w/exec";
+        const DEFAULT_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzLdeQPRcUG3zaG_8IY3_oDZqPCo2XzVJbNEZCL0VifYzaqmOjDYsBDMRfqKgC2GzVqaw/exec";
 
         // Se l'utente passa un parametro ?app=... nell'URL usa quello, altrimenti usa il link di default
         const urlParams = new URLSearchParams(window.location.search);
@@ -116,11 +462,29 @@
         const iframe = document.getElementById('app-frame');
         const loader = document.getElementById('loader');
 
+        // Rilevamento se l'app è aperta dalla schermata Home (Standalone / PWA)
+        const isStandalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+                             (window.navigator && window.navigator.standalone === true) ||
+                             urlParams.get('mode') === 'app' ||
+                             urlParams.get('mode') === 'standalone' ||
+                             localStorage.getItem('ildis_app_installed') === 'true';
+
+        if (isStandalone) {
+            try { localStorage.setItem('ildis_app_installed', 'true'); } catch(e){}
+        }
+
+        window.addEventListener('appinstalled', () => {
+            try { localStorage.setItem('ildis_app_installed', 'true'); } catch(e){}
+        });
+
         if (scriptUrl && scriptUrl !== "INSERISCI_QUI_IL_TUO_LINK_APPS_SCRIPT") {
             // Aggiunge eventuali parametri attuali (es. page=operatore o operatore=1)
             let finalUrl = scriptUrl;
             if (window.location.search && !urlParams.has('app')) {
                 finalUrl += (finalUrl.includes('?') ? '&' : '?') + window.location.search.substring(1);
+            }
+            if (isStandalone && !finalUrl.includes('mode=')) {
+                finalUrl += (finalUrl.includes('?') ? '&' : '?') + 'mode=app';
             }
             iframe.src = finalUrl;
 
