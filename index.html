@@ -444,20 +444,15 @@
         const iframe = document.getElementById('app-frame');
         const loader = document.getElementById('loader');
 
-        // Rilevamento se l'app è aperta dalla schermata Home (Standalone / PWA)
+        // Rilevamento se l'app è aperta dalla schermata Home (Standalone / PWA in tempo reale)
         const isStandalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
                              (window.navigator && window.navigator.standalone === true) ||
                              urlParams.get('mode') === 'app' ||
-                             urlParams.get('mode') === 'standalone' ||
-                             localStorage.getItem('ildis_app_installed') === 'true';
+                             urlParams.get('mode') === 'standalone';
 
-        if (isStandalone) {
-            try { localStorage.setItem('ildis_app_installed', 'true'); } catch(e){}
+        if (!isStandalone) {
+            try { localStorage.removeItem('ildis_app_installed'); } catch(e){}
         }
-
-        window.addEventListener('appinstalled', () => {
-            try { localStorage.setItem('ildis_app_installed', 'true'); } catch(e){}
-        });
 
         if (scriptUrl && scriptUrl !== "INSERISCI_QUI_IL_TUO_LINK_APPS_SCRIPT") {
             // Aggiunge eventuali parametri attuali (es. page=operatore o operatore=1)
