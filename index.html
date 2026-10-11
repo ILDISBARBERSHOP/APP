@@ -97,9 +97,9 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(5, 5, 5, 0.96);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
+            background: rgba(5, 5, 5, 0.97);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             z-index: 9999999;
             display: flex;
             flex-direction: column;
@@ -127,22 +127,22 @@
             width: 44px;
             height: 44px;
             border-radius: 50%;
-            background: rgba(245, 199, 150, 0.15);
-            border: 1px solid rgba(245, 199, 150, 0.5);
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.4);
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 0 20px rgba(245, 199, 150, 0.35);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.25);
         }
 
         .in-app-arrow-hint {
             font-size: 0.85rem;
             font-weight: 700;
-            color: #f5c796;
-            background: rgba(20, 20, 20, 0.9);
-            padding: 4px 10px;
+            color: #ffffff;
+            background: rgba(20, 20, 20, 0.95);
+            padding: 5px 12px;
             border-radius: 8px;
-            border: 1px solid rgba(245, 199, 150, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             white-space: nowrap;
         }
 
@@ -153,28 +153,24 @@
 
         .in-app-card {
             background: #111111;
-            border: 1px solid rgba(245, 199, 150, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 22px;
-            padding: 28px 24px;
+            padding: 30px 24px;
             max-width: 420px;
             width: 100%;
             text-align: center;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9), 0 0 30px rgba(245, 199, 150, 0.1);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.95), 0 0 30px rgba(255, 255, 255, 0.05);
             box-sizing: border-box;
         }
 
-        .in-app-logo-badge {
-            display: inline-block;
-            font-size: 0.82rem;
-            letter-spacing: 1.5px;
-            font-weight: 800;
-            color: #f5c796;
-            text-transform: uppercase;
-            margin-bottom: 12px;
-            padding: 5px 14px;
-            background: rgba(245, 199, 150, 0.08);
-            border-radius: 20px;
-            border: 1px solid rgba(245, 199, 150, 0.2);
+        .in-app-logo {
+            max-height: 58px;
+            max-width: 200px;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            margin: 0 auto 16px auto;
+            display: block;
         }
 
         .in-app-title {
@@ -187,7 +183,7 @@
 
         .in-app-desc {
             font-size: 0.9rem;
-            color: #bbb;
+            color: #cccccc;
             line-height: 1.5;
             margin-bottom: 22px;
         }
@@ -216,7 +212,7 @@
             width: 28px;
             height: 28px;
             border-radius: 50%;
-            background: #f5c796;
+            background: #ffffff;
             color: #050505;
             font-weight: 800;
             font-size: 0.88rem;
@@ -228,37 +224,41 @@
 
         .in-app-step-txt {
             font-size: 0.88rem;
-            color: #ddd;
+            color: #e0e0e0;
             line-height: 1.35;
         }
 
         .in-app-step-txt strong {
-            color: #fff;
+            color: #ffffff;
         }
 
         .in-app-actions {
             display: flex;
             flex-direction: column;
             gap: 10px;
-            margin-bottom: 18px;
         }
 
-        .in-app-btn-gold {
+        .in-app-btn-white {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             width: 100%;
-            background: linear-gradient(135deg, #f5c796, #d4af37);
+            background: #ffffff;
             color: #050505;
             font-weight: 800;
             font-size: 0.95rem;
             padding: 14px;
             border-radius: 12px;
             text-decoration: none;
-            box-shadow: 0 4px 15px rgba(245, 199, 150, 0.3);
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
             border: none;
             cursor: pointer;
             box-sizing: border-box;
+            transition: background 0.2s;
+        }
+
+        .in-app-btn-white:hover {
+            background: #f0f0f0;
         }
 
         .in-app-btn-outline {
@@ -266,12 +266,12 @@
             align-items: center;
             justify-content: center;
             width: 100%;
-            background: #222;
-            color: #f5c796;
-            border: 1px solid rgba(245, 199, 150, 0.4);
+            background: #1c1c1c;
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.35);
             font-weight: 600;
             font-size: 0.9rem;
-            padding: 12px;
+            padding: 13px;
             border-radius: 12px;
             cursor: pointer;
             transition: all 0.2s;
@@ -279,22 +279,8 @@
         }
 
         .in-app-btn-outline:hover {
-            background: #2a2a2a;
-        }
-
-        .in-app-btn-dismiss {
-            background: transparent;
-            border: none;
-            color: #777;
-            font-size: 0.82rem;
-            cursor: pointer;
-            text-decoration: underline;
-            padding: 6px;
-            transition: color 0.2s;
-        }
-
-        .in-app-btn-dismiss:hover {
-            color: #aaa;
+            background: #282828;
+            border-color: #ffffff;
         }
     </style>
 </head>
@@ -304,16 +290,16 @@
     <div id="inAppBrowserOverlay" style="display: none;">
         <div class="in-app-arrow-container">
             <div class="in-app-arrow-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#f5c796" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="7" y1="17" x2="17" y2="7"></line>
                     <polyline points="7 7 17 7 17 17"></polyline>
                 </svg>
             </div>
-            <span class="in-app-arrow-hint">Tocca i 3 puntini qui ⋯</span>
+            <span class="in-app-arrow-hint">Tocca i 3 puntini qui</span>
         </div>
 
         <div class="in-app-card">
-            <div class="in-app-logo-badge">✂️ ILDI'S BARBERSHOP</div>
+            <img id="iab-logo" class="in-app-logo" src="icon-512.png" alt="ILDI'S BARBERSHOP">
             <h2 class="in-app-title">Apri nel tuo Browser</h2>
             <p class="in-app-desc">
                 Instagram limita le prenotazioni nel suo browser interno. Per prenotare al meglio e salvare l'app sul telefono, apri questa pagina in Safari o Chrome.
@@ -322,7 +308,7 @@
             <div class="in-app-steps" id="iabIosGuide">
                 <div class="in-app-step-item">
                     <div class="in-app-step-num">1</div>
-                    <div class="in-app-step-txt">In alto a destra tocca i <strong>3 puntini (⋯)</strong></div>
+                    <div class="in-app-step-txt">In alto a destra tocca i <strong>3 puntini (...)</strong></div>
                 </div>
                 <div class="in-app-step-item">
                     <div class="in-app-step-num">2</div>
@@ -331,18 +317,14 @@
             </div>
 
             <div class="in-app-actions">
-                <a id="iabAndroidBtn" href="#" class="in-app-btn-gold" style="display: none;">
-                    🚀 Apri in Google Chrome
+                <a id="iabAndroidBtn" href="#" class="in-app-btn-white" style="display: none;">
+                    Apri in Google Chrome
                 </a>
                 <button type="button" class="in-app-btn-outline" onclick="copyIabLink()">
-                    📋 Copia Link Prenotazione
+                    Copia Link Prenotazione
                 </button>
-                <div id="iabCopyToast" style="display: none; color: #a5d6a7; font-size: 0.85rem; margin-top: 5px;">✓ Link copiato negli appunti!</div>
+                <div id="iabCopyToast" style="display: none; color: #ffffff; font-size: 0.85rem; margin-top: 5px;">Link copiato negli appunti</div>
             </div>
-
-            <button type="button" class="in-app-btn-dismiss" onclick="dismissIabOverlay()">
-                Continua comunque nel browser di Instagram &rarr;
-            </button>
         </div>
     </div>
 
