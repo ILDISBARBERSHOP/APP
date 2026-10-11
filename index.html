@@ -6,6 +6,7 @@
     <meta name="theme-color" content="#050505">
     
     <!-- PWA Settings -->
+    <link rel="canonical" href="https://ildisbarbershop.github.io/APP/">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-512.png">
     <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
@@ -435,7 +436,7 @@
         // CONFIGURAZIONE URL DI GOOGLE APPS SCRIPT
         // Incolla qui sotto tra le virgolette il link del tuo Apps Script Web App:
         // =========================================================================
-        const DEFAULT_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyl87LeqSumOTGeMr46EbnwK0HGxSAfATC746g5nIV92WfqOGNZ_n_FFpi_bdus9XF8DA/exec";
+        const DEFAULT_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzLdeQPRcUG3zaG_8IY3_oDZqPCo2XzVJbNEZCL0VifYzaqmOjDYsBDMRfqKgC2GzVqaw/exec";
 
         // Se l'utente passa un parametro ?app=... nell'URL usa quello, altrimenti usa il link di default
         const urlParams = new URLSearchParams(window.location.search);
@@ -454,14 +455,12 @@
             try { localStorage.removeItem('ildis_app_installed'); } catch(e){}
         }
 
-        if (scriptUrl && scriptUrl !== "INSERISCI_QUI_IL_TUO_LINK_APPS_SCRIPT") {
-            // Aggiunge eventuali parametri attuali (es. page=operatore o operatore=1)
+            // Se l'app viene avviata da schermata Home (standalone), carica SEMPRE la pagina principale (operatore)
             let finalUrl = scriptUrl;
-            if (window.location.search && !urlParams.has('app')) {
+            if (isStandalone) {
+                finalUrl += (finalUrl.includes('?') ? '&' : '?') + 'page=operatore&mode=app';
+            } else if (window.location.search && !urlParams.has('app')) {
                 finalUrl += (finalUrl.includes('?') ? '&' : '?') + window.location.search.substring(1);
-            }
-            if (isStandalone && !finalUrl.includes('mode=')) {
-                finalUrl += (finalUrl.includes('?') ? '&' : '?') + 'mode=app';
             }
             iframe.src = finalUrl;
 
