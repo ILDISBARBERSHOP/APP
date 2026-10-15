@@ -457,7 +457,7 @@
         // CONFIGURAZIONE URL DI GOOGLE APPS SCRIPT
         // Incolla qui sotto tra le virgolette il link del tuo Apps Script Web App:
         // =========================================================================
-        const DEFAULT_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzWSWpS02RaxvnKC3gWJ79FbXHb-TxDMG2JBp4KkZNIzxA-hQXq4YQVsv4JYUUfkEj-Kg/exec";
+        const DEFAULT_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzLdeQPRcUG3zaG_8IY3_oDZqPCo2XzVJbNEZCL0VifYzaqmOjDYsBDMRfqKgC2GzVqaw/exec";
 
         const scriptUrl = urlParams.get('app') || DEFAULT_APPS_SCRIPT_URL;
 
@@ -510,7 +510,10 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('PWA Service Worker registrato con successo'))
+                    .then(reg => {
+                        console.log('PWA Service Worker registrato con successo');
+                        try { reg.update(); } catch(e){}
+                    })
                     .catch(err => console.log('Errore Service Worker:', err));
             });
         }
