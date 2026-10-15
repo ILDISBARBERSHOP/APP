@@ -1,12 +1,13 @@
 // Service Worker per PWA ILDI'S BARBERSHOP
-const CACHE_NAME = 'ildis-barbershop-v3';
+const CACHE_NAME = 'ildis-barbershop-v4';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manutenzione.html',
   './manifest.json',
   './icon-192.png',
-  './icon-512.png'
+  './icon-512.png',
+  './logo.png'
 ];
 
 self.addEventListener('install', (event) => {
