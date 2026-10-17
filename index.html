@@ -26,11 +26,15 @@
         OneSignalDeferred.push(async function(OneSignal) {
             await OneSignal.init({
                 appId: "99e105ba-936b-4de0-91ed-28b0475ea2c9",
+                safari_web_id: "web.onesignal.auto.1150f274-be67-4412-813c-e6f1ba6adf3e",
                 path: "/APP/",
                 serviceWorkerPath: "OneSignalSDKWorker.js",
                 serviceWorkerParam: { scope: "/APP/" },
                 serviceWorkerOverrideForTypical: true,
-                allowLocalhostAsSecureOrigin: true
+                allowLocalhostAsSecureOrigin: true,
+                notifyButton: {
+                    enable: false
+                }
             });
         });
     </script>
