@@ -26,6 +26,10 @@
         OneSignalDeferred.push(async function(OneSignal) {
             await OneSignal.init({
                 appId: "99e105ba-936b-4de0-91ed-28b0475ea2c9",
+                path: "/APP/",
+                serviceWorkerPath: "OneSignalSDKWorker.js",
+                serviceWorkerParam: { scope: "/APP/" },
+                serviceWorkerOverrideForTypical: true,
                 allowLocalhostAsSecureOrigin: true
             });
         });
@@ -669,6 +673,9 @@
                     window.OneSignalDeferred = window.OneSignalDeferred || [];
                     window.OneSignalDeferred.push(async function(OneSignal) {
                         try {
+                            if (OneSignal.User && OneSignal.User.PushSubscription && OneSignal.User.PushSubscription.optIn) {
+                                await OneSignal.User.PushSubscription.optIn();
+                            }
                             if (pendingPushPhone) {
                                 var cleanPhone = pendingPushPhone.toString().replace(/\D/g, '');
                                 if (cleanPhone) {
@@ -741,17 +748,25 @@
                 try {
                     var permResult = await askNotificationPermission();
                     if (permResult === 'granted') {
-                        window.OneSignalDeferred = window.OneSignalDeferred || [];
-                        window.OneSignalDeferred.push(async function(OneSignal) {
-                            try {
-                                if (pendingPushPhone) {
-                                    var cleanPhone = pendingPushPhone.toString().replace(/\D/g, '');
-                                    if (cleanPhone) {
-                                        await OneSignal.login(cleanPhone);
-                                        await OneSignal.User.addTag('telefono', cleanPhone);
+                        await new Promise(function(resolve) {
+                            window.OneSignalDeferred = window.OneSignalDeferred || [];
+                            window.OneSignalDeferred.push(async function(OneSignal) {
+                                try {
+                                    if (OneSignal.User && OneSignal.User.PushSubscription && OneSignal.User.PushSubscription.optIn) {
+                                        await OneSignal.User.PushSubscription.optIn();
                                     }
+                                    if (pendingPushPhone) {
+                                        var cleanPhone = pendingPushPhone.toString().replace(/\D/g, '');
+                                        if (cleanPhone) {
+                                            await OneSignal.login(cleanPhone);
+                                            await OneSignal.User.addTag('telefono', cleanPhone);
+                                        }
+                                    }
+                                } catch(e){
+                                    console.warn('OneSignal registration error:', e);
                                 }
-                            } catch(e){}
+                                resolve();
+                            });
                         });
 
                         if (modal) modal.style.display = 'none';
