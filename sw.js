@@ -1,5 +1,7 @@
-// Service Worker per PWA ILDI'S BARBERSHOP
-const CACHE_NAME = 'ildis-barbershop-v4';
+// Service Worker per PWA ILDI'S BARBERSHOP con supporto OneSignal Web Push
+importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
+
+const CACHE_NAME = 'ildis-barbershop-v5';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

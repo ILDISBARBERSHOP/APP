@@ -17,9 +17,19 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="ILDI'S BARBER">
     <meta name="application-name" content="ILDI'S BARBERSHOP">
-    <meta name="mobile-web-app-capable" content="yes">
-
     <title>ILDI'S BARBERSHOP • Prenotazioni</title>
+
+    <!-- OneSignal Web Push SDK -->
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script>
+        window.OneSignalDeferred = window.OneSignalDeferred || [];
+        OneSignalDeferred.push(async function(OneSignal) {
+            await OneSignal.init({
+                appId: "99e105ba-936b-4de0-91ed-28b0475ea2c9",
+                allowLocalhostAsSecureOrigin: true
+            });
+        });
+    </script>
 
     <style>
         * {
@@ -457,7 +467,7 @@
         // CONFIGURAZIONE URL DI GOOGLE APPS SCRIPT
         // Incolla qui sotto tra le virgolette il link del tuo Apps Script Web App:
         // =========================================================================
-        const DEFAULT_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz1XWy7Yc214uNUVWG58X1LlpEx6Ds5Kh0DHBhFRwNqDVVHc6piW5L5YpGwvEKZ5V6ZIQ/exec";
+        const DEFAULT_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzLdeQPRcUG3zaG_8IY3_oDZqPCo2XzVJbNEZCL0VifYzaqmOjDYsBDMRfqKgC2GzVqaw/exec";
 
         const scriptUrl = urlParams.get('app') || DEFAULT_APPS_SCRIPT_URL;
 
@@ -517,6 +527,72 @@
                     .catch(err => console.log('Errore Service Worker:', err));
             });
         }
+
+        // =========================================================================
+        // ONESIGNAL POSTMESSAGE BRIDGE (Comunicazione con l'Iframe dell'App)
+        // =========================================================================
+        window.addEventListener('message', function(event) {
+            if (!event.data || typeof event.data !== 'object') return;
+            var data = event.data;
+            var frame = document.getElementById('app-frame');
+
+            if (data.type === 'ILDIS_REQUEST_PUSH') {
+                var phone = data.phone || '';
+                window.OneSignalDeferred = window.OneSignalDeferred || [];
+                window.OneSignalDeferred.push(async function(OneSignal) {
+                    try {
+                        var perm = OneSignal.Notifications.permission;
+                        if (!perm) {
+                            await OneSignal.Notifications.requestPermission();
+                        }
+                        var isGranted = !!OneSignal.Notifications.permission;
+                        if (isGranted) {
+                            if (phone) {
+                                var cleanPhone = phone.toString().replace(/\D/g, '');
+                                if (cleanPhone) {
+                                    await OneSignal.login(cleanPhone);
+                                    await OneSignal.User.addTag('telefono', cleanPhone);
+                                }
+                            }
+                            if (frame && frame.contentWindow) {
+                                frame.contentWindow.postMessage({
+                                    type: 'ILDIS_PUSH_RESULT',
+                                    success: true,
+                                    phone: phone
+                                }, '*');
+                            }
+                        } else {
+                            if (frame && frame.contentWindow) {
+                                frame.contentWindow.postMessage({
+                                    type: 'ILDIS_PUSH_RESULT',
+                                    success: false,
+                                    error: 'Permesso notifiche rifiutato dal browser'
+                                }, '*');
+                            }
+                        }
+                    } catch(err) {
+                        if (frame && frame.contentWindow) {
+                            frame.contentWindow.postMessage({
+                                type: 'ILDIS_PUSH_RESULT',
+                                success: false,
+                                error: err ? (err.message || err.toString()) : 'Errore attivazione'
+                            }, '*');
+                        }
+                    }
+                });
+            } else if (data.type === 'ILDIS_CHECK_PUSH_STATUS') {
+                window.OneSignalDeferred = window.OneSignalDeferred || [];
+                window.OneSignalDeferred.push(async function(OneSignal) {
+                    var isGranted = !!OneSignal.Notifications.permission;
+                    if (frame && frame.contentWindow) {
+                        frame.contentWindow.postMessage({
+                            type: 'ILDIS_PUSH_STATUS',
+                            permission: isGranted
+                        }, '*');
+                    }
+                });
+            }
+        });
     </script>
 </body>
 </html>
