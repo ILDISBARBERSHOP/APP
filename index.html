@@ -301,6 +301,97 @@
             background: #282828;
             border-color: #ffffff;
         }
+
+        /* Push Prompt Modal (Top Level) */
+        #pushPromptModal {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 99999999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+            background: rgba(0, 0, 0, 0.78);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            animation: pushFadeIn 0.2s ease forwards;
+        }
+        @keyframes pushFadeIn {
+            from { opacity: 0; transform: scale(0.96); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .push-modal-card {
+            background: #141414;
+            border: 1px solid rgba(212, 175, 55, 0.35);
+            border-radius: 20px;
+            padding: 26px 22px;
+            max-width: 380px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9), 0 0 25px rgba(212, 175, 55, 0.15);
+            box-sizing: border-box;
+        }
+        .push-modal-icon {
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            background: rgba(212, 175, 55, 0.12);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px auto;
+        }
+        .push-modal-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+        .push-modal-desc {
+            font-size: 0.9rem;
+            color: #cccccc;
+            line-height: 1.45;
+            margin-bottom: 22px;
+        }
+        .push-modal-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .push-btn-confirm {
+            width: 100%;
+            background: #d4af37;
+            color: #050505;
+            font-weight: 800;
+            font-size: 0.95rem;
+            padding: 13px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            transition: background 0.15s ease;
+            box-sizing: border-box;
+        }
+        .push-btn-confirm:hover {
+            background: #e5c358;
+        }
+        .push-btn-dismiss {
+            width: 100%;
+            background: transparent;
+            color: #888888;
+            font-weight: 600;
+            font-size: 0.88rem;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+        .push-btn-dismiss:hover {
+            color: #ffffff;
+        }
     </style>
 </head>
 <body>
@@ -467,7 +558,7 @@
         // CONFIGURAZIONE URL DI GOOGLE APPS SCRIPT
         // Incolla qui sotto tra le virgolette il link del tuo Apps Script Web App:
         // =========================================================================
-        const DEFAULT_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxRnla4jh9VN1qWJXoP651rZh9bwwVbr6mZ7ewN-RSnC4TT6XRxA-v_C_iP507TQwQmqA/exec";
+        const DEFAULT_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzLdeQPRcUG3zaG_8IY3_oDZqPCo2XzVJbNEZCL0VifYzaqmOjDYsBDMRfqKgC2GzVqaw/exec";
 
         const scriptUrl = urlParams.get('app') || DEFAULT_APPS_SCRIPT_URL;
 
@@ -531,68 +622,208 @@
         // =========================================================================
         // ONESIGNAL POSTMESSAGE BRIDGE (Comunicazione con l'Iframe dell'App)
         // =========================================================================
+        var pendingPushPhone = '';
+        var pendingPushSender = null;
+
+        function replyToIframe(msg) {
+            var frame = document.getElementById('app-frame');
+            try {
+                if (pendingPushSender) pendingPushSender.postMessage(msg, '*');
+            } catch(e){}
+            try {
+                if (frame && frame.contentWindow && frame.contentWindow !== pendingPushSender) {
+                    frame.contentWindow.postMessage(msg, '*');
+                }
+            } catch(e){}
+        }
+
         window.addEventListener('message', function(event) {
             if (!event.data || typeof event.data !== 'object') return;
             var data = event.data;
             var frame = document.getElementById('app-frame');
+            pendingPushSender = event.source || (frame ? frame.contentWindow : null);
 
             if (data.type === 'ILDIS_REQUEST_PUSH') {
-                var phone = data.phone || '';
-                window.OneSignalDeferred = window.OneSignalDeferred || [];
-                window.OneSignalDeferred.push(async function(OneSignal) {
-                    try {
-                        var perm = OneSignal.Notifications.permission;
-                        if (!perm) {
-                            await OneSignal.Notifications.requestPermission();
-                        }
-                        var isGranted = !!OneSignal.Notifications.permission;
-                        if (isGranted) {
-                            if (phone) {
-                                var cleanPhone = phone.toString().replace(/\D/g, '');
+                pendingPushPhone = data.phone || '';
+
+                if (!('Notification' in window)) {
+                    replyToIframe({
+                        type: 'ILDIS_PUSH_RESULT',
+                        success: false,
+                        error: 'Su iPhone le notifiche funzionano solo se salvi l\'app sulla schermata Home (Condividi ➔ Aggiungi a schermata Home).'
+                    });
+                    return;
+                }
+
+                if (window.Notification && Notification.permission === 'denied') {
+                    replyToIframe({
+                        type: 'ILDIS_PUSH_RESULT',
+                        success: false,
+                        error: 'I permessi notifiche risultano bloccati nelle impostazioni del browser del tuo telefono.'
+                    });
+                    return;
+                }
+
+                // Se i permessi sono già stati concessi in precedenza, registra il telefono e conferma subito
+                if (window.Notification && Notification.permission === 'granted') {
+                    window.OneSignalDeferred = window.OneSignalDeferred || [];
+                    window.OneSignalDeferred.push(async function(OneSignal) {
+                        try {
+                            if (pendingPushPhone) {
+                                var cleanPhone = pendingPushPhone.toString().replace(/\D/g, '');
                                 if (cleanPhone) {
                                     await OneSignal.login(cleanPhone);
                                     await OneSignal.User.addTag('telefono', cleanPhone);
                                 }
                             }
-                            if (frame && frame.contentWindow) {
-                                frame.contentWindow.postMessage({
-                                    type: 'ILDIS_PUSH_RESULT',
-                                    success: true,
-                                    phone: phone
-                                }, '*');
-                            }
-                        } else {
-                            if (frame && frame.contentWindow) {
-                                frame.contentWindow.postMessage({
-                                    type: 'ILDIS_PUSH_RESULT',
-                                    success: false,
-                                    error: 'Permesso notifiche rifiutato dal browser'
-                                }, '*');
-                            }
-                        }
-                    } catch(err) {
-                        if (frame && frame.contentWindow) {
-                            frame.contentWindow.postMessage({
+                            replyToIframe({
                                 type: 'ILDIS_PUSH_RESULT',
-                                success: false,
-                                error: err ? (err.message || err.toString()) : 'Errore attivazione'
-                            }, '*');
+                                success: true,
+                                phone: pendingPushPhone
+                            });
+                        } catch(err) {
+                            replyToIframe({
+                                type: 'ILDIS_PUSH_RESULT',
+                                success: true,
+                                phone: pendingPushPhone
+                            });
                         }
-                    }
-                });
+                    });
+                    return;
+                }
+
+                // Avvisa l'iframe che il prompt è aperto
+                replyToIframe({ type: 'ILDIS_PROMPT_OPENED' });
+
+                // Mostra il modal di attivazione sul top frame
+                var modal = document.getElementById('pushPromptModal');
+                if (modal) {
+                    modal.style.display = 'flex';
+                }
             } else if (data.type === 'ILDIS_CHECK_PUSH_STATUS') {
-                window.OneSignalDeferred = window.OneSignalDeferred || [];
-                window.OneSignalDeferred.push(async function(OneSignal) {
-                    var isGranted = !!OneSignal.Notifications.permission;
-                    if (frame && frame.contentWindow) {
-                        frame.contentWindow.postMessage({
-                            type: 'ILDIS_PUSH_STATUS',
-                            permission: isGranted
-                        }, '*');
-                    }
+                var isGranted = (window.Notification && Notification.permission === 'granted');
+                replyToIframe({
+                    type: 'ILDIS_PUSH_STATUS',
+                    permission: isGranted
                 });
             }
         });
+
+        function askNotificationPermission() {
+            return new Promise(function(resolve) {
+                if (!('Notification' in window)) {
+                    resolve('denied');
+                    return;
+                }
+                try {
+                    var p = Notification.requestPermission(function(perm) {
+                        resolve(perm);
+                    });
+                    if (p && typeof p.then === 'function') {
+                        p.then(resolve).catch(function() {
+                            resolve(Notification.permission || 'default');
+                        });
+                    }
+                } catch(e) {
+                    resolve(Notification.permission || 'denied');
+                }
+            });
+        }
+
+        // Gestione Click Diretto Utente nel Top-Frame (Garantisce l'apertura del prompt di sistema)
+        var confirmBtn = document.getElementById('btnPushConfirm');
+        if (confirmBtn) {
+            confirmBtn.addEventListener('click', async function() {
+                var modal = document.getElementById('pushPromptModal');
+                confirmBtn.disabled = true;
+                confirmBtn.textContent = 'Attivazione in corso...';
+
+                try {
+                    var permResult = await askNotificationPermission();
+                    if (permResult === 'granted') {
+                        window.OneSignalDeferred = window.OneSignalDeferred || [];
+                        window.OneSignalDeferred.push(async function(OneSignal) {
+                            try {
+                                if (pendingPushPhone) {
+                                    var cleanPhone = pendingPushPhone.toString().replace(/\D/g, '');
+                                    if (cleanPhone) {
+                                        await OneSignal.login(cleanPhone);
+                                        await OneSignal.User.addTag('telefono', cleanPhone);
+                                    }
+                                }
+                            } catch(e){}
+                        });
+
+                        if (modal) modal.style.display = 'none';
+                        confirmBtn.disabled = false;
+                        confirmBtn.textContent = 'Attiva Notifiche';
+
+                        replyToIframe({
+                            type: 'ILDIS_PUSH_RESULT',
+                            success: true,
+                            phone: pendingPushPhone
+                        });
+                    } else {
+                        if (modal) modal.style.display = 'none';
+                        confirmBtn.disabled = false;
+                        confirmBtn.textContent = 'Attiva Notifiche';
+
+                        replyToIframe({
+                            type: 'ILDIS_PUSH_RESULT',
+                            success: false,
+                            error: 'Permesso notifiche non concesso. Puoi riprovare quando vuoi.'
+                        });
+                    }
+                } catch(err) {
+                    if (modal) modal.style.display = 'none';
+                    confirmBtn.disabled = false;
+                    confirmBtn.textContent = 'Attiva Notifiche';
+
+                    replyToIframe({
+                        type: 'ILDIS_PUSH_RESULT',
+                        success: false,
+                        error: err ? (err.message || err.toString()) : 'Errore attivazione'
+                    });
+                }
+            });
+        }
+
+        var dismissBtn = document.getElementById('btnPushDismiss');
+        if (dismissBtn) {
+            dismissBtn.addEventListener('click', function() {
+                var modal = document.getElementById('pushPromptModal');
+                if (modal) modal.style.display = 'none';
+                replyToIframe({
+                    type: 'ILDIS_PUSH_RESULT',
+                    success: false,
+                    error: 'Richiesta annullata.'
+                });
+            });
+        }
     </script>
+
+    <!-- Push Prompt Modal (Top Level) -->
+    <div id="pushPromptModal" style="display: none;">
+        <div class="push-modal-card">
+            <div class="push-modal-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+            </div>
+            <h3 class="push-modal-title">Promemoria Appuntamenti</h3>
+            <p class="push-modal-desc">
+                Ricevi un avviso sullo schermo del tuo cellulare prima del taglio per ricordarti data, orario e barbiere.
+            </p>
+            <div class="push-modal-actions">
+                <button type="button" id="btnPushConfirm" class="push-btn-confirm">
+                    Attiva Notifiche
+                </button>
+                <button type="button" id="btnPushDismiss" class="push-btn-dismiss">
+                    Annulla
+                </button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
